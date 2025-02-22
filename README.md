@@ -1,147 +1,152 @@
-# Qdrant RAG Research Agent
+# Vaani.pro RAG Research Agent
 
-An intelligent retrieval and research agent that leverages the power of Qdrant for indexing and vector-based search. This project is built using LangGraph and LangChain, and it is designed to index documents and answer user queries by retrieving the most relevant information from a Qdrant-powered vector database.
+![Cognio Labs Logo](static/cognio_labs_logo.png)
+
+An intelligent multi-agent system powered by Qdrant vector search that combines RAG, financial analysis, and image processing capabilities. Built using LangGraph and LangChain, this system orchestrates multiple specialized agents to provide comprehensive responses to complex queries.
 
 > **Created by Ashutosh Upadhyay (Cognio Labs)**
 
----
+![Vaani.pro Architecture](static/Vaani.pro.png)
 
-## Overview
+## Architecture Overview
 
-This agent provides a simple yet powerful system for:
-- **Indexing**: Documents are parsed and stored in Qdrant as vectors.
-- **Retrieval**: Given a user query, the agent retrieves relevant documents using vector similarity search.
-- **Response Generation**: A language model (e.g., Anthropic's Claude or OpenAI's GPT) generates comprehensive answers based on the retrieved context.
+The system consists of several key components:
 
-The entire system now exclusively uses Qdrant as the vector store for both indexing and retrieval.
+1. **Conversation Management**
+   - Maintains conversation history and current query context
+   - Implements summarization for conversations with more than 3 Q&A pairs
+   - Ensures contextual continuity across interactions
+
+2. **Orchestrator Agent**
+   - Central coordinator that delegates tasks to specialized agents:
+     - RAG Agent: Handles document retrieval and knowledge-based responses
+     - Financial Analysis Agent: Processes financial queries and data
+     - Image Agent: Manages image-related tasks and analysis
+
+3. **Deep Research Pipeline**
+   - Triggered for complex queries requiring in-depth analysis
+   - Generates detailed markdown reports
+   - Provides PDF download capability for research outputs
+
+4. **Vector Search Integration**
+   - Powered by Qdrant for efficient document retrieval
+   - Enables semantic search across indexed content
+   - Supports real-time updates and queries
 
 ---
 
 ## Features
 
-- **Qdrant-Backed Indexing:** Store and index documents in a Qdrant collection for efficient search.
-- **Vector Search Retrieval:** Use cosine similarity to fetch relevant documents based on user queries.
-- **Extensible Research Workflow:** Built on LangGraph, the agent supports multi-step research plans and context-aware conversation.
-- **Easy Configuration:** Set up using environment variables and configuration files.
-- **LLM Integration:** Generate final responses using popular language models.
+- **Multi-Agent Orchestration:** Coordinates between specialized agents for comprehensive responses
+- **Adaptive Summarization:** Automatically condenses long conversations while preserving context
+- **Deep Research Capabilities:** Generates detailed reports for complex queries
+- **Document Management:** Powered by Qdrant vector database for efficient storage and retrieval
+- **Multiple Output Formats:** Supports both immediate responses and detailed PDF reports
 
 ---
 
 ## Prerequisites
 
-Before getting started, ensure you have the following:
-
-- **Python 3.9+**: Required for running the project.
+- **Python 3.9+**: Required for running the project
 - **Qdrant Instance:**  
   - **Local Setup (Docker):**  
     ```bash
     docker run -p 6333:6333 -v $(pwd)/qdrant_storage:/qdrant/storage qdrant/qdrant
     ```
-  - **Cloud Setup:** Alternatively, sign up for [Qdrant Cloud](https://cloud.qdrant.io/) and obtain your API key.
+  - **Cloud Setup:** Sign up for [Qdrant Cloud](https://cloud.qdrant.io/)
 
-- **API Keys for LLMs:** (Optional) If you wish to use a language model for generating responses, set up an account with providers such as Anthropic or OpenAI and obtain the necessary API keys.
+- **API Keys:** Required for various services:
+  - Qdrant API key (for cloud deployment)
+  - LLM API keys (Anthropic/OpenAI)
+  - Additional keys based on enabled features
 
 ---
 
 ## Installation
 
 1. **Clone the Repository:**
-
    ```bash
-   git clone https://github.com/yourusername/rag-research-graph.git
-   cd rag-research-graph
+   git clone https://github.com/cogniolabs/vaani-pro.git
+   cd vaani-pro
    ```
 
 2. **Install Dependencies:**
-
-   It is recommended to work in a virtual environment:
-
    ```bash
    python -m venv venv
    source venv/bin/activate   # On Windows: venv\Scripts\activate
    pip install -e .
    ```
 
-   The Qdrant client along with other necessary packages will be installed.
-
 ---
 
 ## Configuration
 
-Create a `.env` file in the project root with the following content (adjust values as needed):
+Create a `.env` file:
 
 ```dotenv
-# Qdrant configuration
+# Qdrant Configuration
 QDRANT_URL=http://localhost:6333
-# QDRANT_API_KEY is optional for local deployments; required for Qdrant Cloud
-QDRANT_API_KEY=your_qdrant_api_key
+QDRANT_API_KEY=your_qdrant_api_key  # Required for cloud deployment
 
-# LLM API Keys (if using an LLM for response generation)
+# LLM API Keys
 ANTHROPIC_API_KEY=your_anthropic_api_key
 OPENAI_API_KEY=your_openai_api_key
-```
 
-The project's configuration is set to use Qdrant by default. In `src/shared/configuration.py`, the `retriever_provider` is now set to `"qdrant"`.
+# Additional Service Keys (as needed)
+# FINANCIAL_API_KEY=your_financial_api_key
+# IMAGE_PROCESSING_API_KEY=your_image_api_key
+```
 
 ---
 
-## Using the Agent
+## Using the System
 
-### Indexing Documents
+### Starting a Conversation
 
-The indexing graph will ingest documents and store them as vectors in Qdrant. To index documents:
-
-1. **Prepare Your Documents:**
-
-   Documents must follow a JSON format like:
-   ```json
-   [
-     {
-       "page_content": "LangGraph and LangChain enable stateful and multi-agent workflows for AI."
-     }
-   ]
+1. **Initialize the System:**
+   ```bash
+   python -m langgraph.run --graph vaani_pro
    ```
 
-   Alternatively, if you provide an empty list, the agent will load sample documents.
+2. **Input Your Query:**
+   - The system automatically routes your query to appropriate agents
+   - For complex queries, it triggers the deep research pipeline
+   - Responses can be immediate or detailed reports based on query complexity
 
-2. **Run the Indexing Graph:**
+### Document Management
 
-   Use LangGraph Studio or invoke the indexer directly:
+1. **Index New Documents:**
    ```bash
    python -m langgraph.run --graph indexer
    ```
 
-   The indexer collection (`langchain_collection`) will be created in Qdrant and documents will be inserted.
-
-### Retrieving and Answering Queries
-
-After the documents are indexed, use the retrieval graph to handle user queries:
-
-1. **Switch to the Retrieval Graph in LangGraph Studio** (or run it directly):
-   ```bash
-   python -m langgraph.run --graph retrieval_graph
+2. **Document Format:**
+   ```json
+   [
+     {
+       "page_content": "Your document content here",
+       "metadata": {
+         "type": "financial_report",
+         "date": "2024-03-20"
+       }
+     }
+   ]
    ```
-
-2. **Enter Your Query:**
-
-   The agent will:
-   - Use Qdrant to retrieve relevant documents.
-   - Generate a research plan if needed.
-   - Produce a final response based on search results and conversation history.
 
 ---
 
 ## Development and Customization
 
-- **Graph Customization:**  
-  Update the nodes in `src/index_graph` and `src/retrieval_graph` to customize how indexing, retrieval, or response generation works.
+- **Agent Customization:**  
+  Modify agent behaviors in their respective directories:
+  - `src/rag_agent/`
+  - `src/financial_agent/`
+  - `src/image_agent/`
 
-- **Prompts and LLM Settings:**  
-  Modify the prompts in `src/retrieval_graph/prompts.py` to adjust the agent's behavior.  
-  Update LLM model names in the configuration if you want to switch providers (refer to the LLM API documentation for instructions).
+- **Orchestrator Logic:**  
+  Update routing and coordination in `src/orchestrator/`
 
 - **Testing:**  
-  Run unit and integration tests using:
   ```bash
   make test
   make integration_tests
@@ -151,7 +156,7 @@ After the documents are indexed, use the retrieval graph to handle user queries:
 
 ## Credits
 
-This agent was created by **Ashutosh Upadhyay from Cognio Labs**. It demonstrates how to integrate a Qdrant vector database with LangGraph and LangChain for performing retrieval-augmented generation (RAG).
+This agent was created by **Ashutosh Upadhyay from Cognio Labs**. It showcases advanced multi-agent orchestration using LangGraph and LangChain, with Qdrant providing robust vector search capabilities.
 
 ---
 
